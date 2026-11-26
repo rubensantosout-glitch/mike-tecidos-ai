@@ -1,34 +1,30 @@
-# MIKE TECIDOS AI — versão web básica com análise visual por IA
+# MIKE TECIDOS AI — Gemini API (camada gratuita)
 
-## O que inclui
-- Interface adaptada a telemóvel e computador.
-- Carregamento de fotografia.
-- Análise visual por IA através da OpenAI Responses API.
-- Sugestão de tipo provável, alternativas, cor, textura, padrão e confiança visual.
-- Preenchimento do formulário com o resultado e catálogo local com exportação CSV.
+## Inclui
+- Interface web responsiva para iPhone e computador.
+- Upload/fotografia de tecidos.
+- Análise visual com Gemini API, com modelo configurável.
+- Sugestões de tipo provável, cor, textura, padrão e confiança.
+- Catálogo local e exportação CSV.
 
-## Requisitos
-- Node.js 18 ou superior.
-- Uma chave da API OpenAI com acesso e faturação configurados.
-- A chave fica no servidor, nunca no HTML/browser.
+## Configurar API gratuita
+1. Cria uma chave em https://aistudio.google.com/api-keys.
+2. No Render, abre o serviço > Environment.
+3. Adiciona `GOOGLE_API_KEY` com a chave criada.
+4. Adiciona `GOOGLE_MODEL` com `gemini-2.5-flash-lite`.
+5. Faz Save Changes / redeploy.
 
-## Executar localmente
-1. Descompacta o ZIP.
-2. Abre um terminal dentro da pasta.
-3. Executa `npm install`.
-4. Copia `.env.example` para `.env`.
-5. Coloca a tua chave em `OPENAI_API_KEY` no ficheiro `.env`.
-6. Executa `npm start`.
-7. Abre `http://localhost:3000`.
+A API Gemini tem camada gratuita para modelos selecionados, com limites de utilização. Consulta os limites e preços atuais antes de publicar para utilização intensiva: https://ai.google.dev/gemini-api/docs/pricing
 
-## Publicar
-Publica esta pasta num alojamento que suporte Node.js (por exemplo, Render, Railway ou outro alojamento Node).
-Define as variáveis de ambiente `OPENAI_API_KEY` e, opcionalmente, `OPENAI_MODEL` no painel seguro do alojamento.
-O comando de arranque é `npm start`.
+## Publicar no Render
+- Runtime: Node
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Root Directory: vazio, se `package.json` estiver na raiz do repositório.
 
-## Privacidade e limites
-- A fotografia é enviada ao servidor e depois à API para análise.
-- O servidor não guarda as fotografias nem as análises no disco.
-- Os registos do catálogo ficam no armazenamento local do navegador e não sincronizam entre dispositivos.
-- O modelo pode errar. A fotografia não permite confirmar percentagens de fibras ou composição química. Valida com etiqueta, ficha técnica ou testes.
-- Protege a chave da API; nunca a publiques nem a coloques no frontend.
+## Segurança e privacidade
+- Nunca coloques a chave API no HTML, no GitHub ou no browser.
+- Guarda-a apenas nas Environment Variables do Render.
+- No plano gratuito, os dados enviados podem ser usados pela Google para melhorar os produtos, conforme os termos aplicáveis.
+- O serviço não guarda imagens no disco; o catálogo é guardado localmente no browser.
+- A IA apenas sugere uma identificação visual. Não consegue confirmar percentagens de fibras ou composição química por fotografia.
