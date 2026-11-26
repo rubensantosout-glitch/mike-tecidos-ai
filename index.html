@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8f1024">
+<title>MIKE TECIDOS AI</title>
+<style>
+:root{--red:#9e1730;--red2:#c52b43;--ink:#20212a;--muted:#6d707b;--bg:#f5f5f7;--line:#e7e7eb;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink)}
+header{background:linear-gradient(125deg,#721025,#b51e39);color:#fff;padding:24px 18px 30px}
+.wrap{max-width:980px;margin:auto}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border:1px solid #ffffff70;border-radius:13px;display:grid;place-items:center;font-size:23px}
+h1{font-size:22px;letter-spacing:.4px;margin:0}header p{margin:5px 0 0;color:#f5dce1;font-size:13px}
+main{max-width:980px;margin:-14px auto 50px;padding:0 14px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 26px #28202a0a;margin-bottom:15px}
+h2{font-size:17px;margin:0 0 5px}.sub{font-size:13px;color:var(--muted);margin:0 0 17px;line-height:1.5}
+.drop{border:2px dashed #d9b0b8;border-radius:15px;background:#fff9fa;min-height:190px;display:grid;place-items:center;text-align:center;padding:18px;cursor:pointer}
+.drop:hover{border-color:var(--red2);background:#fff5f7}.drop strong{display:block;margin:8px 0 4px}.drop small{color:var(--muted)}
+#preview{display:none;max-width:100%;max-height:330px;border-radius:12px;object-fit:contain}
+.btn{border:0;border-radius:11px;background:var(--red);color:#fff;padding:12px 17px;font-weight:700;cursor:pointer;font-size:14px}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.secondary{background:#f4e8eb;color:var(--red)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;padding:11px 12px;border:1px solid #dedee4;border-radius:10px;background:#fff;font:inherit;font-size:14px}
+.result{display:none;border:1px solid #ead6da;background:#fffafb;border-radius:14px;padding:16px;margin-top:16px}.result h3{margin:0 0 10px;font-size:15px}.pill{display:inline-block;padding:5px 9px;background:#f4e4e8;color:#8b1730;border-radius:20px;font-size:12px;font-weight:700;margin:3px 4px 3px 0}
+.notice{background:#fff7e9;border:1px solid #f1dfbd;border-radius:12px;padding:12px;font-size:12px;line-height:1.5;color:#76531a;margin-top:13px}
+.catalog-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.empty{padding:25px 10px;text-align:center;color:var(--muted);font-size:13px}.item{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:12px 0}.thumb{width:58px;height:58px;border-radius:10px;object-fit:cover;background:#eee}.item b{font-size:13px}.item small{display:block;color:var(--muted);margin-top:4px}
+footer{text-align:center;color:#8a8b93;font-size:11px;padding:10px 20px 30px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.panel{padding:16px}header{padding:20px 16px 27px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+ <div class="brand"><div class="logo">🧵</div><div><h1>MIKE TECIDOS AI</h1><p>Reconhecimento e organização de tecidos</p></div></div>
+</div></header>
+<main>
+ <section class="panel">
+  <h2>1. Carregar fotografia</h2>
+  <p class="sub">Fotografa o tecido de perto, com boa luz e sem filtros. Podes usar a câmara ou escolher uma imagem.</p>
+  <label class="drop" for="photo">
+   <img id="preview" alt="Pré-visualização do tecido">
+   <div id="uploadPrompt"><div style="font-size:32px">📷</div><strong>Adicionar fotografia do tecido</strong><small>JPG, PNG ou WEBP</small></div>
+  </label>
+  <input id="photo" type="file" accept="image/*" capture="environment" hidden>
+  <div class="actions"><button class="btn secondary" id="remove" type="button" disabled>Remover fotografia</button><button class="btn" id="analyze" type="button" disabled>Analisar com IA</button></div>
+  <div class="result" id="aiResult"><h3>Resultado da análise por IA</h3><div id="aiResultBody"></div></div>
+ </section>
+ <section class="panel">
+  <h2>2. Identificação do tecido</h2>
+  <p class="sub">Carrega uma fotografia e usa a IA para obter uma identificação visual provável. Podes depois rever e guardar os dados no catálogo.</p>
+  <div class="grid">
+   <div class="field"><label for="fabric">Tipo de tecido (estimativa)</label><select id="fabric"><option value="">Por identificar</option><option>Algodão</option><option>Poliéster</option><option>Linho</option><option>Malha</option><option>Feltro</option><option>TNT (não tecido)</option><option>Polar / fleece</option><option>Veludo</option><option>Jersey</option><option>Denim / ganga</option><option>Outro</option></select></div>
+   <div class="field"><label for="color">Cor</label><input id="color" placeholder="Ex.: vermelho"></div>
+   <div class="field"><label for="texture">Textura / padrão</label><input id="texture" placeholder="Ex.: macio, felpudo, liso"></div>
+   <div class="field"><label for="width">Largura (cm)</label><input id="width" type="number" min="0" step="1" placeholder="Ex.: 150"></div>
+   <div class="field"><label for="reference">Referência / código</label><input id="reference" placeholder="Ex.: MT-001"></div>
+   <div class="field"><label for="notes">Observações</label><input id="notes" placeholder="Composição, fornecedor, etc."></div>
+  </div>
+  <div class="notice"><b>Nota importante:</b> a IA identifica características visuais e sugere tipos prováveis. Não consegue confirmar com segurança a composição exata (por exemplo, percentagem de algodão ou poliéster) apenas pela fotografia. Confirma sempre com a etiqueta, ficha técnica ou testes.</div>
+  <div class="actions"><button class="btn" id="save" type="button">Guardar no catálogo</button><button class="btn secondary" id="clear" type="button">Limpar campos</button></div>
+  <div class="result" id="result"><h3>Ficha do tecido</h3><div id="resultBody"></div></div>
+ </section>
+ <section class="panel">
+  <div class="catalog-head"><div><h2>3. Catálogo de tecidos</h2><p class="sub" style="margin:4px 0 0">Registos guardados neste dispositivo.</p></div><button class="btn secondary" id="export" type="button">Exportar CSV</button></div>
+  <div id="catalog"><div class="empty">Ainda não existem tecidos guardados.</div></div>
+ </section>
+</main>
+<footer>MIKE TECIDOS AI · Protótipo web básico</footer>
+<script>
+const $=id=>document.getElementById(id);let currentImage="";let latestAnalysis=null;
+const fields=["fabric","color","texture","width","reference","notes"];
+let records=[];
+try{records=JSON.parse(localStorage.getItem("mikeTecidosAI")||"[]")}catch(e){records=[]}
+$("photo").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith("image/")){alert("Escolhe um ficheiro de imagem.");return}const r=new FileReader();r.onload=()=>{currentImage=r.result;latestAnalysis=null;$("preview").src=currentImage;$("preview").style.display="block";$("uploadPrompt").style.display="none";$("remove").disabled=false;$("analyze").disabled=false;$("aiResult").style.display="none"};r.readAsDataURL(f)});
+$("remove").onclick=()=>{currentImage="";latestAnalysis=null;$("photo").value="";$("preview").src="";$("preview").style.display="none";$("uploadPrompt").style.display="block";$("remove").disabled=true;$("analyze").disabled=true;$("aiResult").style.display="none"};
+
+$("analyze").onclick=async()=>{if(!currentImage){alert("Adiciona primeiro uma fotografia.");return}
+ const b=$("analyze");b.disabled=true;b.textContent="A analisar…";$("aiResult").style.display="block";$("aiResultBody").textContent="A IA está a analisar a textura, a cor e o padrão. Aguarda um momento…";
+ try{
+  const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:currentImage})});
+  const data=await res.json();if(!res.ok)throw new Error(data.error||"Não foi possível analisar a imagem.");
+  latestAnalysis=data;
+  $("aiResultBody").innerHTML=`<span class="pill">${esc(data.tipo_provavel||"Tipo incerto")}</span><span class="pill">${esc(data.cor||"Cor não identificada")}</span><p style="font-size:13px;line-height:1.7"><b>Alternativas:</b> ${esc((data.alternativas||[]).join(", ")||"—")}<br><b>Textura:</b> ${esc(data.textura||"—")}<br><b>Padrão:</b> ${esc(data.padrao||"—")}<br><b>Observações:</b> ${esc(data.observacoes||"—")}<br><b>Confiança visual:</b> ${esc(data.confianca||"Não indicada")}</p><p style="font-size:12px;color:#8b1730">${esc(data.aviso||"A composição não pode ser confirmada apenas por fotografia.")}</p><button class="btn" id="applyAI" type="button">Preencher formulário com resultado</button>`;
+  $("applyAI").onclick=()=>{$("fabric").value=data.tipo_provavel||"";$("color").value=data.cor||"";$("texture").value=[data.textura,data.padrao].filter(Boolean).join("; ");$("notes").value=data.observacoes||"Identificação visual assistida por IA; confirmar composição.";};
+ }catch(err){$("aiResultBody").textContent=err.message+" Confirma que o servidor está configurado com a chave de API."}
+ finally{b.disabled=false;b.textContent="Analisar com IA"}
+};
+
+$("clear").onclick=()=>{fields.forEach(id=>$(id).value="");$("result").style.display="none"};
+function render(){const c=$("catalog");if(!records.length){c.innerHTML='<div class="empty">Ainda não existem tecidos guardados.</div>';return}c.innerHTML=records.map((x,i)=>`<div class="item">${x.image?`<img class="thumb" src="${x.image}" alt="">`:'<div class="thumb" style="display:grid;place-items:center">🧵</div>'}<div style="flex:1;min-width:0"><b>${esc(x.reference||"Sem referência")} · ${esc(x.fabric||"Tipo por identificar")}</b><small>${esc(x.color||"Cor não indicada")} · ${esc(x.width?x.width+" cm":"Largura não indicada")}</small></div><button class="btn secondary" data-del="${i}" type="button">Apagar</button></div>`).join("");c.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{records.splice(+b.dataset.del,1);persist();render()})}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function persist(){try{localStorage.setItem("mikeTecidosAI",JSON.stringify(records))}catch(e){alert("O armazenamento deste dispositivo está cheio. Exporta o catálogo e remove algumas fotografias.")}}
+$("save").onclick=()=>{if(!currentImage&&!fields.some(id=>$(id).value.trim())){alert("Adiciona uma fotografia ou preenche pelo menos um campo.");return}const x={};fields.forEach(id=>x[id]=$(id).value.trim());x.image=currentImage;x.date=new Date().toLocaleDateString("pt-PT");records.unshift(x);persist();$("result").style.display="block";$("resultBody").innerHTML=`<span class="pill">${esc(x.fabric||"Tipo por identificar")}</span><span class="pill">${esc(x.color||"Cor por indicar")}</span><p style="font-size:13px;line-height:1.7">${x.texture?"Textura: "+esc(x.texture)+"<br>":""}${x.width?"Largura: "+esc(x.width)+" cm<br>":""}${x.reference?"Referência: "+esc(x.reference)+"<br>":""}Registado em ${x.date}</p><b style="font-size:12px;color:#8b1730">Registo guardado — identificação por confirmar.</b>`;render()};
+$("export").onclick=()=>{if(!records.length){alert("O catálogo está vazio.");return}const cols=["reference","fabric","color","texture","width","notes","date"];const csv=[cols.join(";"),...records.map(x=>cols.map(k=>'"'+String(x[k]||"").replace(/"/g,'""')+'"').join(";"))].join("\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="catalogo-mike-tecidos.csv";a.click();URL.revokeObjectURL(a.href)};
+render();
+</script>
+</body></html>
